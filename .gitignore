@@ -4,3 +4,4 @@ global_contrast.egg-info/
 .vscode/
 __pycache__/
 test.py
+.idea/
