@@ -13,9 +13,10 @@ class GlobalContrastFunction(Function):
         return global_contrast.forward(x)
 
     @staticmethod
-    def backward(ctx, grad, x):
-        x = ctx.saved_variables # no *star here
-        return global_contrast.backward(grad.contiguous(), x)
+    def backward(ctx, grad):
+        x = ctx.saved_variables[0] # no *star here
+        dx = global_contrast.backward(grad.contiguous(), x)
+        return dx
 
 
 class GlobalContrast(nn.Module):
