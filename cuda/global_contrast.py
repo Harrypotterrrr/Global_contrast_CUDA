@@ -28,18 +28,3 @@ class GlobalContrast(nn.Module):
 
     def forward(self, x):
         return GlobalContrastFunction.apply(x)
-
-if __name__ == "__main__":
-
-    B = 1 << 4
-    C = 1 << 2
-    W = 1 << 8
-    H = 1 << 8
-
-    globalContrast = GlobalContrast()
-    print(global_contrast)
-
-    x = torch.rand((B, C, W, H))
-    y = globalContrast(x)
-    
-    print(y)

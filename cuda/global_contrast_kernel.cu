@@ -3,7 +3,6 @@
 
 #include <ATen/ATen.h>
 #include <ATen/cuda/CUDAContext.h>
-#include <c10/util/Exception.h>
 #include <THC/THC.h>
 #include <THC/THCAtomics.cuh>
 #include <THC/THCDeviceUtils.cuh>
@@ -12,7 +11,12 @@
 
 #include <iostream>
 
-#include <vector>
+
+#include <torch/types.h>
+
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 
 // hyper parameter 
 constexpr long BLOCK_SIZE = 32; 
@@ -84,7 +88,6 @@ torch::Tensor global_contrast_cuda_forward(
 ) {
 
     cudaSetDevice(input.get_device());
-    cudaStream_t stream = at::cuda::getCurrentCUDAStream();
 
     const long B = input.size(0);
     const long C = input.size(1);
@@ -99,7 +102,7 @@ torch::Tensor global_contrast_cuda_forward(
         (H + blockSize.y - 1) / blockSize.y);
 
     AT_DISPATCH_FLOATING_TYPES(input.type(), "global_contrast_cuda_forward", ([&]{
-        global_contrast_kernel::forward <scalar_t><<< gridSize, blockSize, 0, stream >>>(
+        global_contrast_kernel::forward <scalar_t><<< gridSize, blockSize>>>(
             input.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
             output.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>()
         );
@@ -115,7 +118,6 @@ torch::Tensor global_contrast_cuda_backward(
 ) {
 
     cudaSetDevice(input.get_device());
-    cudaStream_t stream = at::cuda::getCurrentCUDAStream();
 
     const long B = input.size(0);
     const long C = input.size(1);
@@ -129,8 +131,8 @@ torch::Tensor global_contrast_cuda_backward(
     dim3 gridSize((W + blockSize.x - 1) / blockSize.x, 
         (H + blockSize.y - 1) / blockSize.y);
 
-    AT_DISPATCH_FLOATING_TYPES(input.type(), "global_contrast_cuda_backward", ([&]{
-        global_contrast_kernel::backward <scalar_t><<< gridSize, blockSize, 0, stream >>>(
+        AT_DISPATCH_FLOATING_TYPES(input.type(), "global_contrast_cuda_backward", ([&]{
+        global_contrast_kernel::backward <scalar_t><<< gridSize, blockSize>>>(
             grad.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
             input.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
             d_input.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>()
