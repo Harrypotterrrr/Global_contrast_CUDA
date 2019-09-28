@@ -11,6 +11,16 @@ torch::Tensor global_contrast_cuda_backward(
     const torch::Tensor& input
 );
 
+torch::Tensor global_contrast_cuda_backward_split(
+    const torch::Tensor& grad,
+    const torch::Tensor& input
+);
+
+torch::Tensor global_contrast_cuda_backward_split_3d(
+    const torch::Tensor& grad,
+    const torch::Tensor& input
+);
+
 // c++
 
 #define CHECK_CUDA(x) AT_ASSERTM(x.type().is_cuda(), #x " must be a CUDA tensor")
@@ -33,7 +43,7 @@ torch::Tensor global_contrast_backward(
     CHECK_INPUT(grad);
     CHECK_INPUT(input);
 
-    return global_contrast_cuda_backward(grad, input);
+    return global_contrast_cuda_backward_split_3d(grad, input);
 }
 
 

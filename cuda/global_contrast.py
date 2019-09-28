@@ -14,8 +14,8 @@ class GlobalContrastFunction(Function):
 
     @staticmethod
     def backward(ctx, grad):
-        x = ctx.saved_variables[0] # no *star here
-        dx = global_contrast.backward(grad.contiguous(), x)
+        x = ctx.saved_variables # no *star here
+        dx = global_contrast.backward(grad.contiguous(), *x)
         return dx
 
 

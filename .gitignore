@@ -5,3 +5,4 @@ global_contrast.egg-info/
 __pycache__/
 test.py
 .idea/
+file.txt
