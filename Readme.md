@@ -41,28 +41,11 @@ def backward(
 >>>model = GlobalContrast()
 >>>y = model(x)
 >>>y.size
-tensor([16, 4, 128, 128], device='cuda:0')
+tensor([16, 1, 128, 128], device='cuda:0')
 ```
 
 # Benchmark
 
-**TODO**
-
-**Configurations**
-
-| B | C | W | H |
-| --- | --- | --- | ---- |
-| 128 | 16 | 512 | 512 |
-
-Run in a GTX Titan xp
-
-**Results**
-
-|  | forward(ms) | backward(ms) |
-| --- | --- | --- |
-| naive|3.451 |3.942 |
-|cuda |**0.628** |**1.473** |
-**TODO**
 
 # Reference 
 
