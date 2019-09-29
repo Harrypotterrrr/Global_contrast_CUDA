@@ -45,13 +45,13 @@ if __name__ == "__main__":
         #     globalContrast.zero_grad()
 
         start = time.time()
-        print(x)
         c = globalContrast(x)
-        print(c[0,0])
+        print(c.shape)
+        print(c[0,0,:2,:2])
         elapsed_fw = time.time() - start
         forward_time += elapsed_fw
         # print("**************")
-        # x = torch.rand((B, C, W, H), requires_grad=True).cuda()
+        x = torch.rand((B, C, W, H), requires_grad=True).cuda()
         # print("**************")
 
 

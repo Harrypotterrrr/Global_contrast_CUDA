@@ -3,6 +3,6 @@ dist/
 global_contrast.egg-info/
 .vscode/
 __pycache__/
-test.py
+test.cpp
 .idea/
-file.txt
+files.txt

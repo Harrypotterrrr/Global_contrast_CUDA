@@ -20,7 +20,7 @@
 // #include "TimingGPU.cuh"
 
 // hyper parameter 
-constexpr long BLOCK_SIZE = 512; 
+const long BLOCK_SIZE = 16; 
 
 namespace global_contrast_kernel{
 
@@ -182,7 +182,7 @@ torch::Tensor global_contrast_cuda_forward(
         );
     }));
 
-    // cudaDeviceSynchronize();
+    cudaDeviceSynchronize();
     return output;
 }
 
