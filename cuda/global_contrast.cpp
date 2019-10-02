@@ -6,20 +6,22 @@ torch::Tensor global_contrast_cuda_forward(
     const torch::Tensor& input
 );
 
+
 torch::Tensor global_contrast_cuda_backward(
     const torch::Tensor& grad,
     const torch::Tensor& input
 );
+
+torch::Tensor global_contrast_cuda_forward_split(
+    const torch::Tensor& input
+);
+
 
 torch::Tensor global_contrast_cuda_backward_split(
     const torch::Tensor& grad,
     const torch::Tensor& input
 );
 
-torch::Tensor global_contrast_cuda_backward_split_3d(
-    const torch::Tensor& grad,
-    const torch::Tensor& input
-);
 
 // c++
 
@@ -33,7 +35,7 @@ torch::Tensor global_contrast_forward(
 ) {
     CHECK_INPUT(input);
     
-    return global_contrast_cuda_forward(input);
+    return global_contrast_cuda_forward_split(input);
 }
 
 torch::Tensor global_contrast_backward(
@@ -43,7 +45,7 @@ torch::Tensor global_contrast_backward(
     CHECK_INPUT(grad);
     CHECK_INPUT(input);
 
-    return global_contrast_cuda_backward_split_3d(grad, input);
+    return global_contrast_cuda_backward_split(grad, input);
 }
 
 
