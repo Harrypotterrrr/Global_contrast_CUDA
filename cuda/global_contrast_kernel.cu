@@ -156,6 +156,9 @@ __global__ void _calcSum_backward(
     const long W = feature.size(2);
     const long H = feature.size(3);
 
+    if(bs >= B || ch >= C)
+        return;
+
     scalar_t tmp = 0.0f;
     for(auto i=0 ; i<W ; i++){
         for(auto j=0 ; j<H ; j++){
@@ -186,11 +189,16 @@ __global__ void _calcGrad(
     const long W = feature.size(2);
     const long H = feature.size(3);
 
+    if(col >= W || row >= H)
+        return;
+
     for (auto i=0 ; i<B ; i++){
         for (auto j=0 ; j<C ; j++){
             d_feature[i][j][col][row] = (feature[i][j][col][row] + d_feature[i][j][col][row]) * 4.0f * grad[i][0][col][row];
         }
     }
+    __syncthreads();
+
 }
 
 template <typename scalar_t> 
@@ -207,6 +215,8 @@ __global__ void backward(
     const long W = feature.size(2);
     const long H = feature.size(3);
 
+    if(col >= W || row >= H)
+        return;
 
     scalar_t tmp = 0.0f;
     for (auto i=0 ; i<B ; i++){
@@ -257,6 +267,7 @@ torch::Tensor global_contrast_cuda_forward(
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)
         std::cout << err <<std::endl;
+        
     return output;
 }
 
@@ -391,8 +402,6 @@ torch::Tensor global_contrast_cuda_backward_split(
     if (err != cudaSuccess)
         std::cout << err <<std::endl;
     
-    return output;
-
     return d_feature;
 }
 
