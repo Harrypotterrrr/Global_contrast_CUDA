@@ -382,26 +382,31 @@ torch::Tensor global_contrast_cuda_backward_split(
     dim3 gridSize((B + blockSize.x - 1) / blockSize.x, 
         (C + blockSize.y - 1) / blockSize.y);
 
-    global_contrast_kernel::_calcSum_backward<<< gridSize, blockSize>>>(
-        feature.packed_accessor<double, 4, torch::RestrictPtrTraits, size_t>(),
-        d_feature.packed_accessor<double, 4, torch::RestrictPtrTraits, size_t>()
-    );
+    AT_DISPATCH_FLOATING_TYPES(feature.type(), "global_contrast_cuda_backward", ([&]{
+        global_contrast_kernel::_calcSum_backward <scalar_t> <<< gridSize, blockSize, 0, stream>>>(
+            feature.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
+            d_feature.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>()
+        );
+    }));
+
 
     blockSize = dim3 (BLOCK_SIZE, BLOCK_SIZE);
     gridSize = dim3((W + blockSize.x - 1) / blockSize.x, 
         (H + blockSize.y - 1) / blockSize.y);
 
-    global_contrast_kernel::_calcGrad <<< gridSize, blockSize, 0, stream>>>(
-        grad.packed_accessor<double, 4, torch::RestrictPtrTraits, size_t>(),
-        feature.packed_accessor<double, 4, torch::RestrictPtrTraits, size_t>(),
-        d_feature.packed_accessor<double, 4, torch::RestrictPtrTraits, size_t>()
-    );
+    AT_DISPATCH_FLOATING_TYPES(feature.type(), "global_contrast_cuda_backward", ([&]{
+        global_contrast_kernel::_calcGrad<scalar_t> <<< gridSize, blockSize, 0, stream>>>(
+            grad.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
+            feature.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
+            d_feature.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>()
+        );
+    }));
 
     // Check for errors
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)
         std::cout << err <<std::endl;
-    
+
     return d_feature;
 }
 
