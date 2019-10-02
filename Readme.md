@@ -17,6 +17,7 @@ def forward(
     ------
         output: float tensor, shape (B, 1, W, H)
     """
+
 def backward(
     grad,
     input
@@ -33,19 +34,32 @@ def backward(
     """
 ```
 
-**For example**
+## Test code
+
+### Script
+
+```
+./test.sh <loop_time>
+```
+
+### Ipython
+
 ```python
 >>>import torch 
 >>>from global_contrast import GlobalContrast
->>>x = torch.rand((16, 4, 128, 128)).cuda()
+>>>x = torch.rand((20, 16, 336, 336)).cuda()
 >>>model = GlobalContrast()
 >>>y = model(x)
 >>>y.size
-tensor([16, 1, 128, 128], device='cuda:0')
+tensor([20, 1, 336, 336], device='cuda:0')
 ```
 
 # Benchmark
 
+|  | forward(ms) | backward(ms) |
+| --- | --- | --- |
+| naive| - | - |
+|cuda | **53.693** | **179.787** |
 
 # Reference 
 
