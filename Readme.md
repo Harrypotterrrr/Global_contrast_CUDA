@@ -36,6 +36,11 @@ def backward(
 
 ## Test code
 
+### Installation
+
+```
+./install.sh
+```
 ### Script
 
 ```

@@ -405,66 +405,16 @@ torch::Tensor global_contrast_cuda_backward_split(
     return d_feature;
 }
 
-#include <sys/time.h> 
-torch::Tensor global_contrast_cuda_backward_split_3d(
-    const torch::Tensor& grad,
-    const torch::Tensor& feature
-) {
-
-    cudaSetDevice(feature.get_device());
-    cudaStream_t stream = at::cuda::getCurrentCUDAStream();
-
-    const long B = feature.size(0);
-    const long C = feature.size(1);
-    const long W = feature.size(2);
-    const long H = feature.size(3);
-
-    // allocate output tensor
-    auto d_feature = torch::zeros({B, C, W, H}, feature.options());
-
-struct timeval start, end;
-gettimeofday( &start, NULL );
-
-    // TimingGPU timer_GPU;
-    // timer_GPU.StartCounter();
-    dim3 blockSize(4, 4);
-    dim3 gridSize((B + blockSize.x - 1) / blockSize.x, 
-                (C + blockSize.y - 1) / blockSize.y
-            );
-
-    AT_DISPATCH_FLOATING_TYPES(feature.type(), "global_contrast_cuda_backward", ([&]{
-        global_contrast_kernel::_calcSum_backward <scalar_t><<< gridSize, blockSize, 0, stream>>>(
-            feature.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
-            d_feature.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>()
-        );
-    }));
-    cudaDeviceSynchronize();
-
+/*
 gettimeofday( &end, NULL );
 long  timeuse = 1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;
 gettimeofday( &start, NULL );
-printf("The first stage time is %d us\n", timeuse);
+printf("The first stage time is %ld us\n", timeuse);
 
-    blockSize = dim3 (BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-    gridSize = dim3((C + blockSize.x - 1) / blockSize.x, 
-                    (W + blockSize.y - 1) / blockSize.y, 
-                    (H + blockSize.z - 1) / blockSize.z
-                );
-
-    // AT_DISPATCH_FLOATING_TYPES(feature.type(), "global_contrast_cuda_backward", ([&]{
-    //     global_contrast_kernel::_calcGrad_3d <scalar_t><<< gridSize, blockSize>>>(
-    //         grad.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
-    //         feature.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>(),
-    //         d_feature.packed_accessor<scalar_t, 4, torch::RestrictPtrTraits, size_t>()
-    //     );
-    // }));
-    // cudaDeviceSynchronize();
+...
 
 gettimeofday( &end, NULL );
 timeuse = 1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;
 gettimeofday( &start, NULL );
-printf("The second stage time is %d us\n", timeuse);
-    // printf("Time to generate:  %3.1f ms \n", timer_GPU.GetCounter());
-    
-    return d_feature;
-}
+printf("The second stage time is %ld us\n", timeuse);
+*/
